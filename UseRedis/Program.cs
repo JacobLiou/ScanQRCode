@@ -1,11 +1,26 @@
 ﻿using System;
+using System.Collections.Generic;
 using StackExchange.Redis;
+using System.Text.Json;
 
 namespace UseRedis
 {
     class Program
     {
         static ConnectionMultiplexer connectionMultiplexer;
+
+        class Person
+        {
+            public string Id { get; set; }
+
+            public int Age { get; set; }
+
+            public string Name { get; set; }
+
+            public decimal Salary { get; set; }
+
+            public List<Person> Relatives { get; set; }
+        }
 
         /// <summary>
         /// Redis Server搭建教程  部署在centOs 或者UbuntuServer  也可以本机安装
@@ -29,7 +44,15 @@ namespace UseRedis
 
             db.StringSet("foo", "Goody");
 
+            var person = new Person { Id = Guid.NewGuid().ToString(), Age = 23, Name = "Ghsdhg", Salary = 10000, Relatives = null };
+            db.StringSet("person1", JsonSerializer.Serialize(person));
             var result = db.StringGet("foo");
+
+
+            var jsonPerson = db.StringGet("person1");
+            var realPerson = JsonSerializer.Deserialize<Person>(jsonPerson);
+            Console.WriteLine($"{jsonPerson}");
+
             Console.WriteLine($"{result}");
         }
     }
